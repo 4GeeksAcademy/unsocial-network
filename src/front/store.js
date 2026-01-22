@@ -1,6 +1,7 @@
 export const initialStore=()=>{
   return{
     message: null,
+    posts: [],
     todos: [
       {
         id: 1,
@@ -22,6 +23,13 @@ export default function storeReducer(store, action = {}) {
       return {
         ...store,
         message: action.payload
+      };
+
+    case 'update_posts':
+      let newPosts = action.payload
+      return {
+        ...store,
+        posts: newPosts
       };
       
     case 'add_task':
