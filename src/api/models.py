@@ -17,7 +17,7 @@ class User(db.Model):
 
     def serialize(self):
         return {
-            # "id": self.id,
+            "id": self.id,
             "email": self.email,
             "is_active": self.is_active,
             # do not serialize the password, its a security breach
@@ -35,6 +35,8 @@ class Post(db.Model):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
+    content: Mapped[str] = mapped_column(String(140), nullable=True)
+
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     user: Mapped["User"] = relationship(backref="posts")
 
@@ -44,6 +46,7 @@ class Post(db.Model):
         return {
             "id": self.id,
             "user_id": self.user_id,
+            "content": self.content,
             "user": self.user.serialize(),
             "comments": [comment.serialize() for comment in self.comments],
         }

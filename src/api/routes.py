@@ -103,7 +103,14 @@ def create_post(user_id):
     if user is None:
         raise APIException('User not found', status_code=404)
 
+    if 'content' not in body:
+        raise APIException(
+            'You need to specify the content field', status_code=400)
+
+    content = body['content']
+
     post = Post()
+    post.content = content
     post.user_id = user_id
 
     db.session.add(post)
