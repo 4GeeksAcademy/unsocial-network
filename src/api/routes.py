@@ -6,10 +6,33 @@ from api.models import db, User, Post, Comment
 from api.utils import APIException
 from flask_cors import CORS
 
+from flask_jwt_extended import create_access_token
+
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
 CORS(api)
+
+@api.route("/login", methods=["POST"])
+def login():
+
+    body = request.get_json()
+
+    email = body.get("email", None)
+    password = body.get("password", None)
+
+    if not email or not password:
+        return jsonify({"msg": "Missing email or password"}), 400
+
+    searched_user = User.query.filter_by(email=email).first()
+    if not searched_user:
+        return jsonify({"msg": "Bad email or password"}), 401
+
+    if searched_user.password != password: # Compare passwords directly for simplicity but we will need hashes later
+        return jsonify({"msg": "Bad email or password"}), 401
+
+    access_token = create_access_token(identity=email)
+    return jsonify(access_token=access_token), 200
 
 
 @api.route('/user', methods=['GET'])
