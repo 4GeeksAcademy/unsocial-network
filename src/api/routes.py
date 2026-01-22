@@ -6,7 +6,7 @@ from api.models import db, User, Post, Comment
 from api.utils import APIException
 from flask_cors import CORS
 
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 
 api = Blueprint('api', __name__)
 
@@ -43,6 +43,18 @@ def handle_hello():
     list_of_json_users = [user.serialize() for user in users]
 
     return jsonify(list_of_json_users), 200
+
+
+@api.route('/whoami', methods=['GET'])
+@jwt_required()
+def who_am_i():
+    current_user = get_jwt_identity()
+
+    user = User.get_by_email(current_user)
+    if user is None:
+        raise APIException('User not found', status_code=404)
+
+    return jsonify(user.serialize()), 200
 
 
 def reqVal(body, keys):
